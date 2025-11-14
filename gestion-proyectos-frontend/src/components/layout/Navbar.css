@@ -4,7 +4,7 @@
   align-items: center;
   padding: 0 2rem; /* Espaciado a los lados */
   height: 60px;
-  background-color: var(--secondary-color);
+  background-color: var(--navbar-color);
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
@@ -21,6 +21,18 @@
   text-decoration: none;
   flex-shrink: 0; /* Evita que el logo se encoja */
 }
+
+/* Botón hamburguesa para colapsar/mostrar sidebar */
+.navbar-toggle {
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  padding: 6px 10px;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.navbar-toggle:hover { background: rgba(255,255,255,0.08); }
 
 .navbar-links {
   list-style: none;
@@ -47,6 +59,16 @@
 .navbar-links a:hover,
 .navbar-links a.active {
   color: white;
+}
+
+/* Avatar en la barra superior */
+.navbar-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.25);
+  display: block;
 }
 
 .navbar-welcome {
@@ -86,3 +108,7 @@
 .navbar-logout-btn:hover {
   color: var(--danger-color);
 }
+.navbar-bell { position: relative; color: #bdc3c7; }
+.navbar-bell .badge { position: absolute; top: -6px; right: -10px; background: #e74c3c; color: white; border-radius: 12px; padding: 1px 6px; font-size: 0.75rem; line-height: 1.2; }
+.navbar-bell:hover { color: white; }
+

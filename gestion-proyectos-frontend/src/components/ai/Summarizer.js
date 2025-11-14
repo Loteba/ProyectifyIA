@@ -27,12 +27,11 @@ export default function Summarizer() {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
-      <h2>Generar Resumen</h2>
       <textarea
         rows={8}
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}
-        placeholder="Pega aquÃ­ el texto que deseas resumir..."
+        placeholder="Pega aquí el texto que deseas resumir..."
         style={{
           width: '100%',
           padding: '10px',
@@ -72,3 +71,4 @@ export default function Summarizer() {
     </div>
   );
 }
+

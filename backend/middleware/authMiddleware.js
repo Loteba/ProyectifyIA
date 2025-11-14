@@ -34,4 +34,19 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { protect };
+// Middleware para validar roles específicos
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      res.status(401);
+      throw new Error('No autorizado');
+    }
+    if (!roles.includes(req.user.role)) {
+      res.status(403);
+      throw new Error('Prohibido: rol insuficiente');
+    }
+    next();
+  };
+};
+
+module.exports = { protect, authorize };

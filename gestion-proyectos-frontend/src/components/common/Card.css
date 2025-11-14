@@ -18,6 +18,11 @@
   background-color: #f8f9fa;
 }
 
+/* Dark theme header surface */
+body.theme-dark .card-header {
+  background-color: #0f172a; /* más oscuro que la tarjeta */
+}
+
 .card-header h2 {
   margin: 0;
   font-size: 1.15rem;

@@ -17,7 +17,7 @@
 .project-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.75rem;
   margin-bottom: 1rem;
@@ -32,6 +32,11 @@
 .project-card-header small {
   color: #95a5a6;
 }
+
+.project-badges { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip { padding: 3px 10px; border-radius: 999px; font-size: 12px; border: 1px solid #e5e7eb; color: #374151; background: #f9fafb; }
+.chip-info { background: #eef2ff; border-color: #c7d2fe; color: #1e3a8a; }
+.chip-muted { background: #f3f4f6; border-color: #e5e7eb; color: #374151; }
 
 .project-card-description {
   flex-grow: 1;

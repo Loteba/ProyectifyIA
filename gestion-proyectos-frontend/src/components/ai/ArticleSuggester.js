@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import aiService from '../../services/aiService';
-import libraryService from '../../services/libraryService'; // <-- Correctamente importado
+import libraryService from '../../services/libraryService';
 import Card from '../common/Card';
 import { FaSearch, FaPlus, FaCheck, FaExternalLinkAlt } from 'react-icons/fa';
 import './ArticleSuggester.css';
@@ -25,41 +25,32 @@ const ArticleSuggester = () => {
     try {
       const results = await aiService.suggestArticles(query, year, user.token);
       setArticles(results);
-    } catch (error) { 
-      console.error(error);
-      alert('Hubo un error al buscar artículos. Revisa la consola.');
-    }
-    finally { setIsLoading(false); }
-  };
-
-  // ======================================================================
-  // ESTA ES LA FUNCIÓN CORREGIDA
-  // ======================================================================
-  const handleSave = async (article) => {
-    try {
-      // Usamos la nueva función 'saveSuggestion' que creamos en el servicio.
-      await libraryService.saveSuggestion(article, user.token);
-      
-      // Actualizamos el estado para dar feedback visual al usuario.
-      setSavedArticles(prev => new Set(prev).add(article.resultId));
     } catch (error) {
       console.error(error);
-      // Mostramos el mensaje de error que viene del backend (ej: "Artículo ya guardado")
+      alert('Hubo un error al buscar artículos. Revisa la consola.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async (article) => {
+    try {
+      await libraryService.saveSuggestion(article, user.token);
+      setSavedArticles((prev) => new Set(prev).add(article.resultId));
+    } catch (error) {
+      console.error(error);
       alert(error.response?.data?.message || 'No se pudo guardar el artículo.');
     }
   };
-  // ======================================================================
 
   const renderResults = () => {
     if (isLoading) {
       return <p className="info-message">Buscando artículos relevantes...</p>;
     }
-
     if (hasSearched && articles.length === 0) {
       return <p className="info-message">No se encontraron resultados. Intenta con otros términos.</p>;
     }
-
-    return articles.map(article => (
+    return articles.map((article) => (
       <div key={article.resultId} className="article-item">
         <h4>{article.title}</h4>
         <p className="authors">{article.authors}</p>
@@ -73,7 +64,15 @@ const ArticleSuggester = () => {
             onClick={() => handleSave(article)}
             disabled={savedArticles.has(article.resultId)}
           >
-            {savedArticles.has(article.resultId) ? <><FaCheck /> Guardado</> : <><FaPlus /> Guardar</>}
+            {savedArticles.has(article.resultId) ? (
+              <>
+                <FaCheck /> Guardado
+              </>
+            ) : (
+              <>
+                <FaPlus /> Guardar
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -90,9 +89,9 @@ const ArticleSuggester = () => {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Introduce tu tema de investigación..."
         />
-        <select 
+        <select
           className="year-select"
-          value={year} 
+          value={year}
           onChange={(e) => setYear(e.target.value)}
         >
           <option value="1">Último año</option>
@@ -103,11 +102,10 @@ const ArticleSuggester = () => {
         </select>
         <button type="submit" disabled={isLoading}>{isLoading ? '...' : <FaSearch />}</button>
       </form>
-      <div className="article-results">
-        {renderResults()}
-      </div>
+      <div className="article-results">{renderResults()}</div>
     </Card>
   );
 };
 
 export default ArticleSuggester;
+

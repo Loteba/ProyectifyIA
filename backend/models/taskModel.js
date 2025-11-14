@@ -21,11 +21,18 @@ const taskSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Pendiente', 'En Progreso', 'Completada'],
+    enum: ['Pendiente', 'En Progreso', 'Completada', 'Cancelada'],
     default: 'Pendiente',
   },
+  // Fecha límite de la tarea (opcional). Se puede asignar por defecto a N días.
+  dueDate: { type: Date },
 }, {
   timestamps: true,
 });
+
+// Índices de rendimiento
+taskSchema.index({ project: 1, createdAt: -1 });
+taskSchema.index({ user: 1, createdAt: -1 });
+taskSchema.index({ dueDate: 1, status: 1 });
 
 module.exports = mongoose.model('Task', taskSchema);

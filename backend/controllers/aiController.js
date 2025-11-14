@@ -3,6 +3,7 @@
 
 const { GoogleGenAI } = require('@google/genai');
 const axios = require('axios');
+const MetricEvent = require('../models/metricEventModel');
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
@@ -70,17 +71,26 @@ const summarizeText = async (req, res) => {
         { role: 'user', parts: [{ text: `Texto a resumir:\n${text}` }] },
         { role: 'user', parts: [{ text: userPrompt }] },
       ],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
+      generationConfig: { temperature: 0.3, maxOutputTokens: 512 },
     });
-
-    const resp = await withRetry(exec);
+    // Enfoque rápido: límite duro de ~2.8s para el 80%
+    const timeoutMs = Number(process.env.AI_TIMEOUT_MS || 12000);
+    const resp = await Promise.race([
+      withRetry(exec),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
+    ]);
     const summary = extractText(resp);
+    // Registrar evento de resumen generado
+    try {
+      await MetricEvent.create({ user: req.user?._id, type: 'summary_generated', meta: { model } });
+    } catch (e) { /* no bloquear por métricas */ }
     return res.json({ summary, model });
   } catch (err) {
     console.error('Gemini summarizeText error:', safeErrorPayload(err));
-    res.status(res.statusCode !== 200 ? res.statusCode : 500);
+    const code = err?.message === 'timeout' ? 504 : 500;
+    res.status(code);
     return res.json({
-      message: 'Error al contactar la API de Google AI (Summarize)',
+      message: err?.message === 'timeout' ? 'La generación tomó demasiado tiempo. Intenta con menos texto o vuelve a intentarlo.' : 'Error al contactar la API de Google AI (Summarize)',
       ...safeErrorPayload(err),
     });
   }
@@ -111,17 +121,21 @@ const handleChat = async (req, res) => {
         ...mappedHistory,
         { role: 'user', parts: [{ text: message }] },
       ],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
+      generationConfig: { temperature: 0.7, maxOutputTokens: 512 },
     });
-
-    const resp = await withRetry(exec);
+    const timeoutMs = Number(process.env.AI_TIMEOUT_MS || 12000);
+    const resp = await Promise.race([
+      withRetry(exec),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
+    ]);
     const text = extractText(resp);
     return res.json({ text, model });
   } catch (err) {
     console.error('Gemini chat error:', safeErrorPayload(err));
-    res.status(res.statusCode !== 200 ? res.statusCode : 500);
+    const code = err?.message === 'timeout' ? 504 : 500;
+    res.status(code);
     return res.json({
-      message: 'Error al contactar la API de Google AI (Chat)',
+      message: err?.message === 'timeout' ? 'La respuesta del chat tomó demasiado tiempo, intenta de nuevo.' : 'Error al contactar la API de Google AI (Chat)',
       ...safeErrorPayload(err),
     });
   }
@@ -156,7 +170,7 @@ const suggestArticles = async (req, res) => {
     const params = { engine: 'google_scholar', q: query, api_key: apiKey };
     if (yearFrom && Number(yearFrom)) params.as_ylo = Number(yearFrom);
 
-    const { data } = await axios.get('https://serpapi.com/search.json', { params });
+    const { data } = await axios.get('https://serpapi.com/search.json', { params, timeout: 2000 });
 
     if (data?.error) {
       console.error('SerpAPI error:', data.error);

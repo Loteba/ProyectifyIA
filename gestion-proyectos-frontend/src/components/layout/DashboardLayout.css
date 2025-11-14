@@ -10,6 +10,35 @@
   transition: margin-left 0.3s ease;
 }
 
+/* Sidebar colapsado en escritorio */
+body.sidebar-collapsed .dashboard-content {
+  margin-left: 72px;
+}
+
+/* Overrides responsivos para off-canvas */
+@media (max-width: 992px) {
+  .dashboard-content {
+    margin-left: 0;
+  }
+}
+
+/* Overlay para off-canvas en móvil/tablet */
+.sidebar-overlay {
+  position: fixed;
+  inset: 60px 0 0 0; /* debajo de la navbar */
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+@media (max-width: 992px) {
+  body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-container {
     flex-direction: column;

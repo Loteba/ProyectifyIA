@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set_me}
+      MONGO_INITDB_DATABASE: ai_research
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://root:${MONGO_ROOT_PASSWORD}@mongo:27017/ai_research?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:?set_me}
+      ENFORCE_HTTPS: ${ENFORCE_HTTPS:-true}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      ADMIN_CREATION_SECRET: ${ADMIN_CREATION_SECRET:?set_me}
+      RESEND_API_KEY: ${RESEND_API_KEY:?set_me}
+      RESEND_FROM: ${RESEND_FROM:?set_me}
+      NOTIFY_EMAIL_ON_ARTICLE: ${NOTIFY_EMAIL_ON_ARTICLE:-true}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:?set_me}
+      SERPAPI_API_KEY: ${SERPAPI_API_KEY:?set_me}
+      DROPBOX_ACCESS_TOKEN: ${DROPBOX_ACCESS_TOKEN:?set_me}
+      GEMINI_MODEL_TEXT: ${GEMINI_MODEL_TEXT:-gemini-2.5-flash}
+      GEMINI_MODEL_CHAT: ${GEMINI_MODEL_CHAT:-gemini-2.5-flash}
+    depends_on:
+      - mongo
+
+  web:
+    build:
+      context: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+
+volumes:
+  mongo_data:

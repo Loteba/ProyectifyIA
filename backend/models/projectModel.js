@@ -26,3 +26,5 @@ const projectSchema = mongoose.Schema(
 );
 
 module.exports = mongoose.model('Project', projectSchema);
+// Índice para usuario y fecha de creación
+projectSchema.index({ user: 1, createdAt: -1 });

@@ -1,0 +1,249 @@
+﻿﻿// src/pages/HomePage.js
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import { FaBolt, FaSearch, FaFolderOpen, FaUsers, FaComments, FaChartLine } from 'react-icons/fa';
+import './HomePage.css';
+
+const HomePage = () => {
+  const { user } = useContext(AuthContext);
+
+  const PrimaryCTA = () => (
+    user ? (
+      <Link className="btn btn-primary" to="/dashboard/projects">Ir a mis proyectos</Link>
+    ) : (
+      <Link className="btn btn-primary" to="/register">Comenzar</Link>
+    )
+  );
+
+  const SecondaryCTA = () => (
+    user ? (
+      <Link className="btn btn-outline" to="/dashboard/library">Abrir mi biblioteca</Link>
+    ) : (
+      <Link className="btn btn-outline" to="/login">Iniciar sesión</Link>
+    )
+  );
+
+  return (
+    <div className="home-wrap">
+      {/* HERO */}
+      <section className="home-hero" aria-label="Portada ProyectifyIA">
+        <img
+          className="hero-bg"
+          src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop"
+          alt="Fondo tecnológico con código y dispositivos"
+        />
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <h1>ProyectifyIA — Tu asistente de investigación MERN con IA</h1>
+          <p>
+            Gestiona proyectos, resume textos, sugiere artículos y organiza tu
+            biblioteca científica en un solo lugar.
+          </p>
+          <div className="hero-actions">
+            <PrimaryCTA />
+            <SecondaryCTA />
+          </div>
+        </div>
+      </section>
+
+      {/* BENEFICIOS RÁPIDOS */}
+      <section className="benefits-wrap" aria-label="Beneficios rápidos">
+      <div className="container benefits shelf">
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaBolt /></div>
+          <h3>Ahorra tiempo con IA</h3>
+          <p>Genera resúmenes claros y estructurados en segundos.</p>
+        </div>
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaSearch /></div>
+          <h3>Encuentra artículos clave</h3>
+          <p>Búsqueda inteligente en Scholar con filtros por año.</p>
+        </div>
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaFolderOpen /></div>
+          <h3>Organiza tu biblioteca</h3>
+          <p>Guarda PDFs y links; etiqueta y encuentra rápido.</p>
+        </div>
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaUsers /></div>
+          <h3>Coordina tu equipo</h3>
+          <p>Proyectos y tareas en un panel centralizado.</p>
+        </div>
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaComments /></div>
+          <h3>Chatea con tus fuentes</h3>
+          <p>Chatbot contextual con tus PDFs y proyectos.</p>
+        </div>
+        <div className="benefit-card">
+          <div className="benefit-icon"><FaChartLine /></div>
+          <h3>Sigue tus resultados</h3>
+          <p>Panel de progreso para que sepas qué presentar.</p>
+        </div>
+      </div>
+      </section>
+
+      {/* STATS BAND */}
+      <section className="stats-band" aria-label="Indicadores rápidos">
+        <div className="container stats">
+          <div className="stat"><div className="stat-value">100+</div><div className="stat-label">Proyectos gestionados</div></div>
+          <div className="stat"><div className="stat-value">1.5k+</div><div className="stat-label">Papers guardados</div></div>
+          <div className="stat"><div className="stat-value">2.3k+</div><div className="stat-label">Resúmenes generados</div></div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="container features" aria-label="Características">
+        <article className="feature-card">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?q=80&w=1200&auto=format&fit=crop" alt="Procesamiento de lenguaje natural e IA" />
+          </div>
+          <div className="feature-text">
+            <h3>Resumidor IA</h3>
+            <p>Resúmenes con objetivos, método, hallazgos y límites.</p>
+            <ul>
+              <li>Estructura clara listo para tus informes</li>
+              <li>Control de tono y longitud</li>
+              <li>Soporte a texto largo por fragmentación</li>
+            </ul>
+          </div>
+        </article>
+
+        <article className="feature-card alt">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop" alt="Interfaz de chat asistido por IA" />
+          </div>
+          <div className="feature-text">
+            <h3>Chatbot contextual</h3>
+            <p>Conversación guiada para interpretar tus fuentes y redactar con apoyo.</p>
+            <ul>
+              <li>Respuestas con referencias claras</li>
+              <li>Memoria por proyecto para seguir hilos</li>
+              <li>Sugerencias de siguiente paso sin tecnicismos</li>
+            </ul>
+          </div>
+        </article>
+
+        <article className="feature-card">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200&auto=format&fit=crop" alt="Artículos académicos y búsqueda guiada" />
+          </div>
+          <div className="feature-text">
+            <h3>Explora artículos sugeridos</h3>
+            <p>Encuentra papers recientes con filtros simples y guárdalos en tu biblioteca.</p>
+            <ul>
+              <li>Busca por tema y año sin salir de la app</li>
+              <li>Guarda tus hallazgos en un clic</li>
+              <li>Accede a enlaces y resúmenes al instante</li>
+            </ul>
+          </div>
+        </article>
+
+        <article className="feature-card">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop" alt="Gestión de PDFs y recursos" />
+          </div>
+          <div className="feature-text">
+            <h3>Tu biblioteca, ordenada</h3>
+            <p>Sube tus PDFs y enlaces favoritos, ponles etiquetas y encuéntralos rápido.</p>
+            <ul>
+              <li>Listas y notas para cada fuente</li>
+              <li>Búsqueda instantánea por etiquetas</li>
+              <li>Todo accesible desde el dashboard</li>
+            </ul>
+          </div>
+        </article>
+
+        <article className="feature-card">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1200&auto=format&fit=crop" alt="Trabajo en equipo y colaboración" />
+          </div>
+          <div className="feature-text">
+            <h3>Colaboración</h3>
+            <p>Proyectos, tareas y notificaciones para coordinar a tu equipo.</p>
+            <ul>
+              <li>Invitaciones y roles claros</li>
+              <li>Tareas con recordatorios</li>
+              <li>Notificaciones por email cuando importa</li>
+            </ul>
+          </div>
+        </article>
+
+        <article className="feature-card">
+          <div className="feature-media">
+            <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1200&auto=format&fit=crop" alt="Panel con métricas y recordatorios" />
+          </div>
+          <div className="feature-text">
+            <h3>Panel de progreso</h3>
+            <p>Visualiza entregables próximos y métricas clave para tus reportes.</p>
+            <ul>
+              <li>Gráficos para seguir tu ritmo</li>
+              <li>Tareas próximas resaltadas</li>
+              <li>Indicadores listos para presentar</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+      {/* CÓMO FUNCIONA (paso + imagen) */}
+      <section className="container how-steps" aria-label="Cómo funciona">
+        <h2>Cómo funciona</h2>
+        <div className="steps-grid">
+          <article className="step-card">
+            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop" alt="Registro y bienvenida" />
+            <h4>1) Crea tu cuenta</h4>
+          </article>
+          <article className="step-card">
+            <img src="https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?q=80&w=1200&auto=format&fit=crop" alt="Crear proyecto" />
+            <h4>2) Crea un proyecto</h4>
+          </article>
+          <article className="step-card">
+            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200&auto=format&fit=crop" alt="Búsqueda en biblioteca/Scholar" />
+            <h4>3) Busca y guarda artículos</h4>
+          </article>
+          <article className="step-card">
+            <img src="https://images.unsplash.com/photo-1555255707-c07966088b7b?q=80&w=1200&auto=format&fit=crop" alt="Resumidor y chat con IA" />
+            <h4>4) Resume y chatea con IA</h4>
+          </article>
+          <article className="step-card">
+            <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1200&auto=format&fit=crop" alt="Presentación de avances en equipo" />
+            <h4>5) Presenta tu avance</h4>
+          </article>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="container faq" aria-label="Preguntas frecuentes">
+        <h2>Preguntas frecuentes</h2>
+        <details>
+          <summary>¿Necesito cuenta para usar ProyectifyIA?</summary>
+          <p>Sí. Crea tu cuenta gratis y accede a tus proyectos y biblioteca.</p>
+        </details>
+        <details>
+          <summary>¿El resumidor tiene límites de texto?</summary>
+          <p>Soporta textos largos mediante fragmentación automática para mantener coherencia.</p>
+        </details>
+        <details>
+          <summary>¿Puedo colaborar con mi equipo?</summary>
+          <p>Sí. Invita miembros, asigna tareas y gestiona notificaciones.</p>
+        </details>
+        <details>
+          <summary>¿Puedo exportar mis recursos?</summary>
+          <p>Desde la biblioteca puedes descargar y gestionar tus enlaces y archivos.</p>
+        </details>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="container cta-final" aria-label="Call to action final">
+        <h2>¿Listo para acelerar tu investigación?</h2>
+        <div className="hero-actions">
+          <PrimaryCTA />
+          <SecondaryCTA />
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default HomePage;
+

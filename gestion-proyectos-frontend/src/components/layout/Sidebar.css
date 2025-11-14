@@ -1,5 +1,5 @@
 .sidebar-nav {
-  background-color: var(--secondary-color);
+  background-color: var(--sidebar-color);
   color: #ecf0f1;
   width: 250px;
   height: calc(100vh - 60px);
@@ -8,6 +8,7 @@
   left: 0;
   padding-top: 2rem;
   border-right: 1px solid #34495e;
+  transition: width 0.25s ease, transform 0.25s ease;
 }
 
 .sidebar-nav nav ul {
@@ -45,3 +46,69 @@
 .sidebar-nav nav ul li a span {
   font-weight: 500;
 }
+
+/* Estado colapsado en desktop */
+body.sidebar-collapsed .sidebar-nav {
+  width: 72px;
+}
+body.sidebar-collapsed .sidebar-nav nav ul li a {
+  justify-content: center;
+  gap: 0.75rem;
+}
+body.sidebar-collapsed .sidebar-nav nav ul li a span {
+  display: none;
+}
+
+/* Comportamiento mobile: off-canvas */
+@media (max-width: 992px) {
+  .sidebar-nav {
+    width: 240px;
+    transform: translateX(-100%);
+    height: calc(100vh - 60px);
+  }
+  body.sidebar-open .sidebar-nav {
+    transform: translateX(0);
+  }
+}
+
+/* Botón de cierre visible solo en móvil/tablet */
+.sidebar-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none;
+  background: rgba(255,255,255,0.08);
+  color: #e5e7eb;
+  border: 1px solid rgba(255,255,255,0.12);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+}
+@media (max-width: 992px) {
+  .sidebar-close { display: inline-block; }
+}
+
+/* Caja de perfil en la parte superior del sidebar */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 12px 16px;
+  margin-top: -8px;
+}
+.sidebar-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.sidebar-profile .name { font-weight: 600; color: #fff; }
+.sidebar-profile .email { font-size: 12px; color: #bfc6ce; }
+
+/* Oculta textos de perfil en modo colapsado */
+body.sidebar-collapsed .sidebar-profile .name,
+body.sidebar-collapsed .sidebar-profile .email { display: none; }

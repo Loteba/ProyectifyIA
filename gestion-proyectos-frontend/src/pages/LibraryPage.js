@@ -1,8 +1,9 @@
-// src/pages/LibraryPage.js
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import libraryService from '../services/libraryService';
 import { FaFileUpload, FaBookOpen } from 'react-icons/fa';
+import { useToast } from '../components/common/ToastProvider';
+import ConfirmModal from '../components/common/ConfirmModal';
 import './LibraryPage.css';
 
 const UploadForm = ({ onUploadSuccess }) => {
@@ -13,11 +14,13 @@ const UploadForm = ({ onUploadSuccess }) => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useContext(AuthContext);
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!pdfFile) { setError('Por favor, selecciona un archivo PDF.'); return; }
-    setIsSubmitting(true); setError('');
+    setIsSubmitting(true);
+    setError('');
 
     const formData = new FormData();
     formData.append('title', title);
@@ -27,12 +30,18 @@ const UploadForm = ({ onUploadSuccess }) => {
     formData.append('pdfFile', pdfFile);
 
     try {
-      // El servicio usa interceptor; el token que pasamos se ignora si existe.
       const newItem = await libraryService.uploadItem(formData, user?.token);
-      onUploadSuccess(newItem); // <- disparará el refetch en la página
-      setTitle(''); setSummary(''); setTags(''); setPdfFile(null); e.target.reset();
+      onUploadSuccess(newItem);
+      toast?.success('PDF guardado en tu biblioteca');
+      setTitle('');
+      setSummary('');
+      setTags('');
+      setPdfFile(null);
+      e.target.reset();
     } catch (err) {
-      setError('Error al subir el archivo: ' + (err?.response?.data?.message || err.message));
+      const message = 'Error al subir el archivo: ' + (err?.response?.data?.message || err.message);
+      setError(message);
+      toast?.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -40,7 +49,7 @@ const UploadForm = ({ onUploadSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="card-body">
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="form-error">{error}</p>}
       <div className="form-group">
         <label>Título (opcional)</label>
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -58,7 +67,7 @@ const UploadForm = ({ onUploadSuccess }) => {
         <input type="file" onChange={(e) => setPdfFile(e.target.files[0])} required accept=".pdf" />
       </div>
       <button type="submit" className="upload-button" disabled={isSubmitting}>
-        {isSubmitting ? 'Guardando...' : 'Guardar en Biblioteca'}
+        {isSubmitting ? 'Guardando…' : 'Guardar en Biblioteca'}
       </button>
     </form>
   );
@@ -69,20 +78,19 @@ const LibraryPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmCfg, setConfirmCfg] = useState({ title: '', message: '', confirmText: 'Confirmar', cancelText: 'Cancelar', tone: 'default', onConfirm: null });
   const { user } = useContext(AuthContext);
-
-  // Debounce timer ref
+  const toast = useToast();
   const debounceRef = useRef(null);
+  const userToken = user?.token;
 
-  // ---- Función central para obtener items ----
-  const fetchItems = async (term = '') => {
-    // Si no hay usuario autenticado, no pedimos
-    if (!user?.token) return;
-
+  const fetchItems = useCallback(async (term = '') => {
+    if (!userToken) return;
     setIsLoading(true);
     setError('');
     try {
-      // El servicio es compatible: getItems(token, search) | getItems(search)
       const items = await libraryService.getItems(term.trim());
       setLibraryItems(Array.isArray(items) ? items : []);
     } catch (e) {
@@ -92,29 +100,22 @@ const LibraryPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userToken]);
 
-  // Carga inicial al montar (trae TODO)
   useEffect(() => {
-    if (!user?.token) return;
     fetchItems('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.token]);
+  }, [fetchItems]);
 
-  // Búsqueda con debounce (500ms)
   useEffect(() => {
-    if (!user?.token) return;
+    if (!userToken) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchItems(searchTerm);
     }, 500);
     return () => clearTimeout(debounceRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, user?.token]);
+  }, [searchTerm, userToken, fetchItems]);
 
-  // Refrescar lista tras subir
   const handleUploadSuccess = async (newItem) => {
-    // Opcional: si coincide con el filtro actual, lo metemos al inicio para feedback instantáneo
     const matchesFilter =
       !searchTerm ||
       newItem?.title?.toLowerCase?.().includes?.(searchTerm.toLowerCase());
@@ -123,9 +124,37 @@ const LibraryPage = () => {
       setLibraryItems(prev => [newItem, ...prev]);
     }
 
-    // Pero en cualquier caso, hacemos refetch del servidor para no desincronizar
     await fetchItems('');
-    setSearchTerm(''); // limpiamos búsqueda para mostrar todo
+    setSearchTerm('');
+  };
+
+  const performDelete = async (itemId) => {
+    setDeletingId(itemId);
+    try {
+      await libraryService.deleteItem(itemId);
+      setLibraryItems(prev => prev.filter((item) => item._id !== itemId));
+      toast?.success('Recurso eliminado');
+    } catch (err) {
+      console.error('Library delete error:', err);
+      toast?.error('No se pudo eliminar el recurso');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const requestDelete = (item) => {
+    setConfirmCfg({
+      title: 'Eliminar recurso',
+      message: `¿Eliminar "${item.title || 'este recurso'}" de forma permanente?`,
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+      onConfirm: async () => {
+        await performDelete(item._id);
+        setConfirmOpen(false);
+      }
+    });
+    setConfirmOpen(true);
   };
 
   return (
@@ -153,14 +182,14 @@ const LibraryPage = () => {
             <div className="card-body">
               <input
                 type="text"
-                placeholder="Buscar en la biblioteca..."
+                placeholder="Buscar en la biblioteca…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="library-search-input"
               />
 
-              {isLoading && <p>Buscando...</p>}
-              {!isLoading && error && <p style={{ color: 'red' }}>{error}</p>}
+              {isLoading && <p>Buscando…</p>}
+              {!isLoading && error && <p className="form-error">{error}</p>}
 
               {!isLoading && !error && (
                 <>
@@ -182,30 +211,30 @@ const LibraryPage = () => {
                               </div>
                             )}
 
-                            {item.link && (
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="resource-action-button"
+                            <div className="resource-actions">
+                              {item.link && (
+                                <a
+                                  href={item.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="resource-action-button"
+                                >
+                                  Abrir recurso
+                                </a>
+                              )}
+                              <button
+                                type="button"
+                                className="resource-delete-button"
+                                onClick={() => requestDelete(item)}
+                                disabled={deletingId === item._id}
                               >
-                                Abrir Recurso
-                              </a>
-                            )}
+                                {deletingId === item._id ? 'Eliminando…' : 'Eliminar'}
+                              </button>
+                            </div>
                           </div>
 
-                          <div style={{ marginTop: 6 }}>
-                            <span
-                              style={{
-                                background: item.itemType === 'pdf' ? '#fef3c7' : '#e0f2fe',
-                                border: '1px solid #ddd',
-                                padding: '2px 8px',
-                                borderRadius: 999,
-                                fontSize: 12
-                              }}
-                            >
-                              {item.itemType}
-                            </span>
+                          <div className="resource-type-chip">
+                            {item.itemType}
                           </div>
                         </li>
                       ))}
@@ -217,6 +246,17 @@ const LibraryPage = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title={confirmCfg.title}
+        message={confirmCfg.message}
+        confirmText={confirmCfg.confirmText}
+        cancelText={confirmCfg.cancelText}
+        tone={confirmCfg.tone}
+        onConfirm={confirmCfg.onConfirm}
+      />
     </div>
   );
 };

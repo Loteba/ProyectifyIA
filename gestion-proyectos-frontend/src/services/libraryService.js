@@ -68,7 +68,9 @@ export const getItems = async (...args) => {
 
   const params = { search: search || undefined };
   const { data } = await API.get(`${BASE}`, { params });
-  return data;
+  if (Array.isArray(data)) return data;           // compat antiguo
+  if (data && Array.isArray(data.items)) return data.items; // nuevo formato { items, total, ... }
+  return [];
 };
 
 // ---------- Delete item ----------

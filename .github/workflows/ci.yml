@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create env file for prod compose (dummy)
+        run: |
+          echo "MONGO_ROOT_PASSWORD=testpass" >> .env
+          echo "JWT_SECRET=testjwt" >> .env
+          echo "GOOGLE_API_KEY=dummy" >> .env
+          echo "SERPAPI_API_KEY=dummy" >> .env
+          echo "DROPBOX_ACCESS_TOKEN=dummy" >> .env
+
+      - name: Build dev images
+        run: docker compose build
+
+      - name: Start services for tests
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from api-tests
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v

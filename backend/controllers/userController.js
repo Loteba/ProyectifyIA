@@ -12,6 +12,7 @@ const generateToken = (id) => {
   });
 };
 
+ 
 // @desc    Registrar un nuevo usuario
 // @route   POST /api/users
 // @access  Público
@@ -33,14 +34,29 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Generar el salt y hashear la contraseña
-  const salt = await bcrypt.genSalt(10);
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
+  const salt = await bcrypt.genSalt(Number.isFinite(rounds) ? rounds : 10);
   const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Determinar rol solicitado (permitir 'admin' solo con clave válida)
+  const requestedRole = req.body && req.body.role === 'admin' ? 'admin' : 'user';
+  let finalRole = 'user';
+  if ((req.body && req.body.role) === 'admin') {
+    const providedKey = String((req.body && req.body.adminKey) || '');
+    const secret = process.env.ADMIN_CREATION_SECRET || 'Jenkins2025';
+    if (providedKey === secret) {
+      finalRole = 'admin';
+    }
+  } else if (['investigador', 'estudiante', 'user'].includes(String(req.body?.role || '').toLowerCase())) {
+    finalRole = String(req.body.role).toLowerCase();
+  }
 
   // Crear el usuario en la base de datos
   const user = await User.create({
     name,
     email,
     password: hashedPassword,
+    role: finalRole,
   });
 
   // Si el usuario se creó correctamente, enviar los datos y el token
@@ -49,6 +65,8 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
+      avatarUrl: user.avatarUrl || null,
       token: generateToken(user.id),
     });
   } else {
@@ -75,6 +93,8 @@ const loginUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
+      avatarUrl: user.avatarUrl || null,
       token: generateToken(user.id),
     });
   } else {
@@ -82,6 +102,31 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(401); // 401 = Unauthorized
     throw new Error('Email o contraseña inválidos');
   }
+});
+
+ 
+// @desc    Obtener perfil del usuario autenticado
+// @route   GET /api/users/me
+// @access  Privado
+const getMe = asyncHandler(async (req, res) => {
+  res.json(req.user);
+});
+
+// @desc    Eliminar cuenta del usuario (LPDP - derecho de supresión)
+// @route   DELETE /api/users/me
+// @access  Privado
+const deleteMe = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  await Promise.all([
+    require('../models/projectModel').deleteMany({ user: userId }),
+    require('../models/taskModel').deleteMany({ user: userId }),
+    require('../models/libraryItemModel').deleteMany({ user: userId }),
+  ]);
+
+  await User.deleteOne({ _id: userId });
+
+  return res.status(204).send();
 });
 
 

@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: ai_research_test
+    ports:
+      - "27018:27017"
+
+  api-tests:
+    build:
+      context: ./backend
+      target: dev
+    environment:
+      NODE_ENV: test
+      PORT: 5001
+      MONGO_URI: mongodb://root:example@mongo:27017/ai_research_test?authSource=admin
+      JWT_SECRET: test_secret
+      GOOGLE_API_KEY: dummy
+      SERPAPI_API_KEY: dummy
+      DROPBOX_ACCESS_TOKEN: dummy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    command: ["npm", "test", "--", "--watchAll=false"]
+
+  web-tests:
+    build:
+      context: ./frontend
+      target: builder
+    working_dir: /app
+    command: ["npm", "test", "--", "--watchAll=false"]

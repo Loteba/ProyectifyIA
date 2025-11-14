@@ -1,0 +1,56 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: ai_research
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build:
+      context: ./backend
+      target: dev
+    container_name: api
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGO_URI: mongodb://root:example@mongo:27017/ai_research?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      ENFORCE_HTTPS: ${ENFORCE_HTTPS:-false}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
+      ADMIN_CREATION_SECRET: ${ADMIN_CREATION_SECRET:-Jenkins2025}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-onboarding@resend.dev}
+      NOTIFY_EMAIL_ON_ARTICLE: ${NOTIFY_EMAIL_ON_ARTICLE:-false}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-dummy}
+      SERPAPI_API_KEY: ${SERPAPI_API_KEY:-dummy}
+      DROPBOX_APP_KEY: ${DROPBOX_APP_KEY:-}
+      DROPBOX_APP_SECRET: ${DROPBOX_APP_SECRET:-}
+      DROPBOX_REFRESH_TOKEN: ${DROPBOX_REFRESH_TOKEN:-}
+      GEMINI_MODEL_TEXT: ${GEMINI_MODEL_TEXT:-gemini-2.5-flash}
+      GEMINI_MODEL_CHAT: ${GEMINI_MODEL_CHAT:-gemini-2.5-flash}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    ports:
+      - "5000:5000"
+
+  web:
+    build:
+      context: ./gestion-proyectos-frontend   # <— aquí el cambio
+    container_name: web
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+volumes:
+  mongo_data:
+

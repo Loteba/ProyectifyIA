@@ -1,163 +1,221 @@
-/* --- Estructura General de la Página --- */
 .library-page {
-    background-color: #f0f2f5;
-    padding: 24px;
-    border-radius: 8px;
+  background-color: #f0f4f8;
+  padding: 24px;
+  border-radius: 8px;
 }
 
 .library-container {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
 .library-form-column {
-    flex: 0 0 35%;
-    position: sticky;
-    top: 24px;
+  flex: 0 0 35%;
+  position: sticky;
+  top: 24px;
 }
 
 .library-list-column {
-    flex: 1;
+  flex: 1;
 }
 
-/* --- Estilo de Tarjeta Principal --- */
 .content-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e7e7e7;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e7e7e7;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 16px;
-    border-bottom: 1px solid #e7e7e7;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid #e7e7e7;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .card-body {
-    padding: 24px;
+  padding: 24px;
 }
 
-/* --- Estilos de Formularios --- */
 .form-group {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #555;
-    font-size: 0.9rem;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.9rem;
 }
 
 .form-group input[type="text"],
 .form-group textarea,
 .form-group input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    box-sizing: border-box; 
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.form-error {
+  color: #b91c1c;
+  margin-bottom: 12px;
 }
 
 .upload-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  width: 100%;
+  padding: 12px;
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .upload-button:disabled {
-    background-color: #95a5a6;
-    cursor: not-allowed;
+  background-color: #a3a3a3;
+  cursor: not-allowed;
 }
 
 .upload-button:hover:not(:disabled) {
-    background-color: #2ecc71;
+  background-color: #16a34a;
 }
 
-/* --- Lista de Recursos --- */
 .library-search-input {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 16px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #cbd5f0;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 .resource-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .resource-list-item {
-    padding: 16px 0;
-    border-bottom: 1px solid #e7e7e7;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .resource-list-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .resource-list-item h4 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-    color: #2c3e50;
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: #1f2937;
 }
 
 .resource-list-item p {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 12px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
 .tags-container {
-    margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .tag-item {
-    display: inline-block;
-    background-color: #3498db;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    margin-right: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
+  display: inline-block;
+  background-color: #2563eb;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-right: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .resource-action-button {
-    display: inline-block;
-    background-color: #101f8e;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background-color: #e0e7ff;
+  color: #1d4ed8;
+  border: 1px solid #c7d2fe;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .resource-action-button:hover {
-    background-color: #2980b9;
-    color: white;
+  background-color: #c7d2fe;
+  color: #1e40af;
+}
+
+.resource-action-button:active {
+  transform: translateY(1px);
+}
+
+.resource-delete-button {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.resource-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resource-delete-button:hover:not(:disabled) {
+  background-color: #fecaca;
+  color: #991b1b;
+}
+
+.resource-type-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
