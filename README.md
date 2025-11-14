@@ -18,7 +18,7 @@ npm start
 
 ## Despliegue en Railway
 
-Crea **dos servicios separados** desde este repositorio:
+Crea **dos servicios separados** (o usa los `railway.json` dentro de cada carpeta) desde este repositorio:
 
 1. **API**
    - Root directory: `backend`
@@ -32,3 +32,4 @@ Crea **dos servicios separados** desde este repositorio:
    - Variable `REACT_APP_API_URL` apuntando al dominio del backend
 
 El script `start:prod` usa `serve` para publicar la carpeta `build` en el puerto especificado por Railway.
+
